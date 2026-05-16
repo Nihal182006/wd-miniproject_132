@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pro Calculator</title>
+
+<style>
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg,#141e30,#243b55);
+    font-family: Arial;
+}
+
+.container {
+    display: flex;
+    gap: 20px;
+}
+
+/* CALCULATOR */
+.calculator {
+    background: #111;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px black;
+}
+
+#display {
+    width: 100%;
+    height: 60px;
+    font-size: 22px;
+    text-align: right;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    border: none;
+    background: black;
+    color: #0f0;
+}
+
+.mode {
+    color: white;
+    font-size: 12px;
+    margin-bottom: 10px;
+    text-align: right;
+}
+
+/* BUTTON GRID */
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 65px);
+    gap: 8px;
+}
+
+button {
+    height: 55px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #333;
+    color: white;
+    font-size: 15px;
+}
+
+button:hover { background: #555; }
+
+.operator { background: orange; }
+.equal { background: green; grid-column: span 2; }
+.clear { background: red; }
+.special { background: #007bff; }
+
+/* HISTORY */
+.history {
+    width: 220px;
+    background: #222;
+    color: white;
+    padding: 15px;
+    border-radius: 15px;
+    overflow-y: auto;
+}
+
+.history h3 {
+    margin-top: 0;
+}
+
+/* CLEAR HISTORY BUTTON */
+.clear-history {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 8px;
+    background: red;
+    color: white;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.clear-history:hover {
+    background: darkred;
+}
+
+.history-item {
+    font-size: 13px;
+    border-bottom: 1px solid #444;
+    padding: 5px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- CALCULATOR -->
+<div class="calculator">
+    <input type="text" id="display" readonly>
+    <div class="mode">Mode: DEG</div>
+
+    <div class="buttons">
+        <button class="clear" onclick="clearDisplay()">C</button>
+        <button onclick="deleteLast()">⌫</button>
+        <button onclick="append('(')">(</button>
+        <button onclick="append(')')">)</button>
+        <button class="operator" onclick="append('/')">/</button>
+
+        <button onclick="sin()">sin</button>
+        <button onclick="cos()">cos</button>
+        <button onclick="tan()">tan</button>
+        <button onclick="log()">log</button>
+        <button class="operator" onclick="append('*')">*</button>
+
+        <button onclick="append('7')">7</button>
+        <button onclick="append('8')">8</button>
+        <button onclick="append('9')">9</button>
+        <button onclick="square()">x²</button>
+        <button class="operator" onclick="append('-')">-</button>
+
+        <button onclick="append('4')">4</button>
+        <button onclick="append('5')">5</button>
+        <button onclick="append('6')">6</button>
+        <button onclick="sqrt()">√</button>
+        <button class="operator" onclick="append('+')">+</button>
+
+        <button onclick="append('1')">1</button>
+        <button onclick="append('2')">2</button>
+        <button onclick="append('3')">3</button>
+        <button class="equal" onclick="calculate()">=</button>
+
+        <button onclick="append('0')">0</button>
+        <button onclick="append('.')">.</button>
+    </div>
+</div>
+
+<!-- HISTORY PANEL -->
+<div class="history">
+    <h3>History</h3>
+    <button class="clear-history" onclick="clearHistory()">Clear</button>
+    <div id="history-list"></div>
+</div>
+
+</div>
+
+<script>
+let display = document.getElementById("display");
+let historyList = document.getElementById("history-list");
+
+/* BASIC */
+function append(val){ display.value += val; }
+function clearDisplay(){ display.value = ""; }
+function deleteLast(){ display.value = display.value.slice(0,-1); }
+
+/* CALCULATE */
+function calculate(){
+    try {
+        let result = eval(display.value);
+        addHistory(display.value + " = " + result);
+        display.value = result;
+    } catch {
+        display.value = "Error";
+    }
+}
+
+/* HISTORY */
+function addHistory(text){
+    let div = document.createElement("div");
+    div.className = "history-item";
+    div.innerText = text;
+    historyList.prepend(div);
+}
+
+function clearHistory(){
+    historyList.innerHTML = "";
+}
+
+/* SCIENTIFIC */
+function square(){ display.value = Math.pow(display.value,2); }
+function sqrt(){ display.value = Math.sqrt(display.value); }
+function log(){ display.value = Math.log10(display.value); }
+
+function sin(){ display.value = Math.sin(toRad(display.value)); }
+function cos(){ display.value = Math.cos(toRad(display.value)); }
+function tan(){ display.value = Math.tan(toRad(display.value)); }
+
+/* DEGREE MODE */
+function toRad(val){
+    return val * Math.PI / 180;
+}
+
+/* KEYBOARD SUPPORT */
+document.addEventListener("keydown", function(e){
+    if(!isNaN(e.key) || "+-*/().".includes(e.key)){
+        append(e.key);
+    }
+    if(e.key === "Enter") calculate();
+    if(e.key === "Backspace") deleteLast();
+});
+</script>
+
+</body>
+</html>
